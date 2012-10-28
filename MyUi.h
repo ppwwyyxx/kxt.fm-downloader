@@ -1,5 +1,5 @@
 // $File: MyUi.h
-// $Date: Sun Oct 28 01:44:09 2012 +0800
+// $Date: Sun Oct 28 11:35:34 2012 +0800
 // Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #ifndef H_DUOMI_UI
 #define H_DUOMI_UI
@@ -8,6 +8,7 @@
 #include <QtNetwork>
 #include <QNetworkCookieJar>
 #include <QFileDialog>
+#include <QNetworkRequest>
 #include "base64/base64.h"
 #include "ui_duomi.h"
 #include <fstream>
@@ -17,7 +18,7 @@ using namespace std;
 class MyWin: public QMainWindow, public Ui::MainWindow{
 	Q_OBJECT QString refUrl, downloadUrl;
 	QNetworkAccessManager * downloader;
-	std::ofstream fout;
+	ofstream fout;
 	QNetworkReply * page;
 	QNetworkReply * data;
 	bool getUrl();

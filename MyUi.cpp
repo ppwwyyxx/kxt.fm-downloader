@@ -1,5 +1,5 @@
 // $File: MyUi.cpp
-// $Date: Sun Oct 28 01:41:20 2012 +0800
+// $Date: Sun Oct 28 11:37:09 2012 +0800
 // Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #include "MyUi.h"
 
@@ -70,6 +70,7 @@ void MyWin::downloadData(){
 	}
 	print_msg(QString("URL found: ") + downloadUrl );
 	cout << "URL found: " + downloadUrl.toStdString()  << endl;
+
 	QString m_dir = QFileDialog::getExistingDirectory (0, "Choose a place to download..", QDir::homePath() + QString("/Desktop"), QFileDialog::ShowDirsOnly );
 	if (m_dir == ""){
 		lineEdit->setEnabled(true);
@@ -77,9 +78,19 @@ void MyWin::downloadData(){
 		return;
 	}
 
-	std::string file_path = m_dir.toStdString() + "/" + downloadUrl.split("/").last().toStdString();
-	fout.open(file_path.c_str(), std::ios::binary | std::ios::out);
-	data = downloader->get(QNetworkRequest(QUrl(downloadUrl)));
+	string file_path = m_dir.toStdString() + "/" + downloadUrl.split("/").last().toStdString();
+	fout.open(file_path.c_str(), ios::binary | ios::out);
+	// set header
+	QNetworkRequest header;
+	header.setUrl(QUrl(downloadUrl));
+	header.setRawHeader("Accept-Charset", "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3");
+	header.setRawHeader("Accept-Language", "en-us,en;q=0.8");
+	header.setRawHeader("Connection", "keep-alive");
+	header.setRawHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
+	header.setRawHeader("Referer", "http://ear.duomi.com/wp-content/plugins/audio-player/assets/player.swf?ver=2.0.4.1");
+
+	// start download
+	data = downloader->get(header);
 	connect(data, SIGNAL(downloadProgress(qint64, qint64)),
 			this, SLOT(setProgress(qint64, qint64)));
 	connect(data, SIGNAL(finished()),
