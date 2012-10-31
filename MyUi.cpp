@@ -1,5 +1,5 @@
 // $File: MyUi.cpp
-// $Date: Sun Oct 28 11:37:09 2012 +0800
+// $Date: Wed Oct 31 21:15:47 2012 +0800
 // Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #include "MyUi.h"
 
@@ -15,13 +15,14 @@ MyWin::MyWin(){
 
 bool MyWin::getUrl(){
 	QByteArray html = page->readAll();
+	//cout << html.data();
 	int index_ = html.indexOf("soundFile:\"");
 	if(index_ != -1){
 		index_ += strlen("soundFile:\"");
 		QByteArray encoded;
 		for(;html[index_] != '"';index_++)
 			encoded += html[index_];
-		downloadUrl = QString(base64_decode(encoded.data()).c_str());
+		downloadUrl = QString(QByteArray::fromBase64(encoded).data());
 		return true;
 	}
 	return false;
@@ -46,11 +47,11 @@ void MyWin::downloadPage(){
 			this, SLOT(downloadData()));
 }
 
-void MyWin::downloadError(){//QNetworkReply::NetworkError code_){
+void MyWin::downloadError(QString Err){//QNetworkReply::NetworkError code_){
 	lineEdit->setEnabled(true);
     label_3->setPixmap(QPixmap(QString::fromUtf8("sun.jpg")));
 	fout.close();
-	print_msg(QString::fromUtf8("Errors Occurred"));
+	print_msg(Err);
 //			if(page!=NULL)
 ////				page->deleteLater();
 //				delete page;
@@ -61,11 +62,11 @@ void MyWin::downloadError(){//QNetworkReply::NetworkError code_){
 
 void MyWin::downloadData(){
 	if( page->error() != QNetworkReply::NoError ){
-		downloadError();
+		downloadError(QString::fromUtf8("error on downloading page"));
 		return;
 	}
 	if(!getUrl()){
-		downloadError();//QNetworkReply::NoError);
+		downloadError(QString::fromUtf8("error on get Url"));//QNetworkReply::NoError);
 		return;
 	}
 	print_msg(QString("URL found: ") + downloadUrl );
@@ -107,7 +108,7 @@ void MyWin::setProgress(qint64 value, qint64 total){
 
 void MyWin::allFinished(){
 	if( data->error() != QNetworkReply::NoError ){
-		downloadError();
+		downloadError(QString::fromUtf8("error on finished"));
 		return;
 	}
 	fout.close();

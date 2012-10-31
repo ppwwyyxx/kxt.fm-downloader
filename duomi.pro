@@ -4,12 +4,10 @@
 
 TEMPLATE = app
 TARGET =
-DEPENDPATH += . base64
-INCLUDEPATH += . base64
 
 # Input
-HEADERS += MyUi.h base64/base64.h
+HEADERS += MyUi.h
 FORMS += duomi.ui
-SOURCES += duomi.cpp MyUi.cpp base64/base64.cpp
+SOURCES += duomi.cpp MyUi.cpp
 QT += network
 RC_FILE = duomi.rc
