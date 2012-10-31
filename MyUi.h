@@ -1,5 +1,5 @@
 // $File: MyUi.h
-// $Date: Wed Oct 31 21:14:51 2012 +0800
+// $Date: Wed Oct 31 21:31:55 2012 +0800
 // Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #ifndef H_DUOMI_UI
 #define H_DUOMI_UI
@@ -15,7 +15,7 @@
 using namespace std;
 
 class MyWin: public QMainWindow, public Ui::MainWindow{
-	Q_OBJECT QString refUrl, downloadUrl;
+	Q_OBJECT QString downloadUrl;
 	QNetworkAccessManager * downloader;
 	ofstream fout;
 	QNetworkReply * page;

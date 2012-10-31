@@ -1,5 +1,5 @@
 // $File: MyUi.cpp
-// $Date: Wed Oct 31 21:15:47 2012 +0800
+// $Date: Wed Oct 31 21:31:54 2012 +0800
 // Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #include "MyUi.h"
 
@@ -8,21 +8,20 @@ MyWin::MyWin(){
 	setupUi(this);
 	downloader = new QNetworkAccessManager;
 	downloader->setCookieJar(new QNetworkCookieJar);
-	connect(lineEdit, SIGNAL(returnPressed()),
-			this, SLOT(downloadPage()));
+	connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(downloadPage()));
 	page = data = NULL;
 }
 
 bool MyWin::getUrl(){
 	QByteArray html = page->readAll();
-	//cout << html.data();
-	int index_ = html.indexOf("soundFile:\"");
-	if(index_ != -1){
-		index_ += strlen("soundFile:\"");
+	string FileMark = "soundFile:\"";
+	int index = html.indexOf(FileMark.c_str());
+	if(index != -1){
+		index += strlen(FileMark.c_str());
 		QByteArray encoded;
-		for(;html[index_] != '"';index_++)
-			encoded += html[index_];
-		downloadUrl = QString(QByteArray::fromBase64(encoded).data());
+		for(;html[index] != '"'; index ++)
+			encoded += html[index];
+		downloadUrl = QString(QByteArray::fromBase64(encoded));
 		return true;
 	}
 	return false;
@@ -38,26 +37,19 @@ void MyWin::downloadPage(){
 	if(data!=NULL)
 		delete data;
 	lineEdit->setEnabled(false);
-    label_3->setPixmap(QPixmap());
+	label_3->setPixmap(QPixmap());
 	page = data = NULL;
-	refUrl = QString("http://") + label_2->text() + lineEdit->text();
-	cout << "Page: " << refUrl.toStdString() << endl;
-	page = downloader->get(QNetworkRequest(QUrl(refUrl)));
-	connect(page, SIGNAL(finished()),
-			this, SLOT(downloadData()));
+	QString req = QString("http://") + label_2->text() + lineEdit->text();
+	cout << "Page: " << req.toStdString() << endl;
+	page = downloader->get(QNetworkRequest(QUrl(req)));
+	connect(page, SIGNAL(finished()), this, SLOT(downloadData()));
 }
 
 void MyWin::downloadError(QString Err){//QNetworkReply::NetworkError code_){
 	lineEdit->setEnabled(true);
-    label_3->setPixmap(QPixmap(QString::fromUtf8("sun.jpg")));
+	label_3->setPixmap(QPixmap(QString::fromUtf8("sun.jpg")));
 	fout.close();
 	print_msg(Err);
-//			if(page!=NULL)
-////				page->deleteLater();
-//				delete page;
-//			if(data!=NULL)
-////				data->deleteLater();
-//				delete data;
 }
 
 void MyWin::downloadData(){
@@ -81,6 +73,7 @@ void MyWin::downloadData(){
 
 	string file_path = m_dir.toStdString() + "/" + downloadUrl.split("/").last().toStdString();
 	fout.open(file_path.c_str(), ios::binary | ios::out);
+
 	// set header
 	QNetworkRequest header;
 	header.setUrl(QUrl(downloadUrl));
@@ -92,15 +85,13 @@ void MyWin::downloadData(){
 
 	// start download
 	data = downloader->get(header);
-	connect(data, SIGNAL(downloadProgress(qint64, qint64)),
-			this, SLOT(setProgress(qint64, qint64)));
-	connect(data, SIGNAL(finished()),
-			this, SLOT(allFinished()));
+	connect(data, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(setProgress(qint64, qint64)));
+	connect(data, SIGNAL(finished()), this, SLOT(allFinished()));
 }
 
 void MyWin::setProgress(qint64 value, qint64 total){
-	QByteArray s = data->readAll();
-	fout.write(s.data(), s.size());
+	QByteArray part = data->readAll();
+	fout.write(part.data(), part.size());
 	progressBar->setTextVisible("true");
 	progressBar->setMaximum(total);
 	progressBar->setValue(value);
@@ -113,11 +104,7 @@ void MyWin::allFinished(){
 	}
 	fout.close();
 	lineEdit->setEnabled(true);
-    label_3->setPixmap(QPixmap(QString::fromUtf8("sun.png")));
-	print_msg(QString("Done!"));
-//	if(page!=NULL)
-//		page->deleteLater();
-//	if(data!=NULL)
-//		data->deleteLater();
+	label_3->setPixmap(QPixmap(QString::fromUtf8("sun.png")));
+	print_msg(QString::fromUtf8("Done!"));
 }
 
