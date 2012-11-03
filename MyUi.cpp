@@ -1,7 +1,5 @@
-// $File: MyUi.cpp
-// $Date: Wed Oct 31 21:31:54 2012 +0800
-// Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #include "MyUi.h"
+#define print_msg(msg) setWindowTitle(msg)
 
 MyWin::MyWin(){
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8")); // Chinese Support
@@ -16,28 +14,19 @@ bool MyWin::getUrl(){
 	QByteArray html = page->readAll();
 	string FileMark = "soundFile:\"";
 	int index = html.indexOf(FileMark.c_str());
-	if(index != -1){
-		index += strlen(FileMark.c_str());
-		QByteArray encoded;
-		for(;html[index] != '"'; index ++)
-			encoded += html[index];
-		downloadUrl = QString(QByteArray::fromBase64(encoded));
-		return true;
-	}
-	return false;
-}
-
-void MyWin::print_msg(const QString & msg){
-	setWindowTitle(msg);
+	if (index == -1) return false;
+	index += strlen(FileMark.c_str());
+	QByteArray raw;
+	while (html[index] != '"') raw += html[index ++];
+	RealUrl = QString(QByteArray::fromBase64(raw));
+	return true;
 }
 
 void MyWin::downloadPage(){
-	if(page!=NULL)
-		delete page;
-	if(data!=NULL)
-		delete data;
-	lineEdit->setEnabled(false);
-	label_3->setPixmap(QPixmap());
+	if (page!=NULL) delete page;
+	if (data!=NULL) delete data;
+	lineEdit->setReadOnly(true);
+	icon->setPixmap(QPixmap());
 	page = data = NULL;
 	QString req = QString("http://") + label_2->text() + lineEdit->text();
 	cout << "Page: " << req.toStdString() << endl;
@@ -45,38 +34,43 @@ void MyWin::downloadPage(){
 	connect(page, SIGNAL(finished()), this, SLOT(downloadData()));
 }
 
-void MyWin::downloadError(QString Err){//QNetworkReply::NetworkError code_){
-	lineEdit->setEnabled(true);
-	label_3->setPixmap(QPixmap(QString::fromUtf8("sun.jpg")));
+void MyWin::downloadError(QString Err){
+	restore();
 	fout.close();
 	print_msg(Err);
 }
 
+void MyWin::restore(){
+	// restore to start state
+	lineEdit->setReadOnly(false);
+	icon->setPixmap(QPixmap(QString("sun.png")));
+	icon->raise();
+}
+
 void MyWin::downloadData(){
-	if( page->error() != QNetworkReply::NoError ){
+	if (page->error() != QNetworkReply::NoError) {
 		downloadError(QString::fromUtf8("error on downloading page"));
 		return;
 	}
-	if(!getUrl()){
-		downloadError(QString::fromUtf8("error on get Url"));//QNetworkReply::NoError);
+	if (!getUrl()) {
+		downloadError(QString::fromUtf8("error on get Url"));
 		return;
 	}
-	print_msg(QString("URL found: ") + downloadUrl );
-	cout << "URL found: " + downloadUrl.toStdString()  << endl;
+	print_msg(QString("URL found: ") + RealUrl);
+	cout << "URL found: " + RealUrl.toStdString()  << endl;
 
+	// choose dir
 	QString m_dir = QFileDialog::getExistingDirectory (0, "Choose a place to download..", QDir::homePath() + QString("/Desktop"), QFileDialog::ShowDirsOnly );
-	if (m_dir == ""){
-		lineEdit->setEnabled(true);
-		label_3->setPixmap(QPixmap(QString::fromUtf8("sun.jpg")));
+	if (m_dir == "") {
+		restore();
 		return;
 	}
-
-	string file_path = m_dir.toStdString() + "/" + downloadUrl.split("/").last().toStdString();
+	string file_path = m_dir.toStdString() + "/" + RealUrl.split("/").last().toStdString();
 	fout.open(file_path.c_str(), ios::binary | ios::out);
 
 	// set header
 	QNetworkRequest header;
-	header.setUrl(QUrl(downloadUrl));
+	header.setUrl(QUrl(RealUrl));
 	header.setRawHeader("Accept-Charset", "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3");
 	header.setRawHeader("Accept-Language", "en-us,en;q=0.8");
 	header.setRawHeader("Connection", "keep-alive");
@@ -98,13 +92,12 @@ void MyWin::setProgress(qint64 value, qint64 total){
 }
 
 void MyWin::allFinished(){
-	if( data->error() != QNetworkReply::NoError ){
+	if (data->error() != QNetworkReply::NoError) {
 		downloadError(QString::fromUtf8("error on finished"));
 		return;
 	}
 	fout.close();
-	lineEdit->setEnabled(true);
-	label_3->setPixmap(QPixmap(QString::fromUtf8("sun.png")));
+	restore();
 	print_msg(QString::fromUtf8("Done!"));
 }
 

@@ -1,6 +1,3 @@
-// $File: MyUi.h
-// $Date: Wed Oct 31 21:31:55 2012 +0800
-// Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 #ifndef H_DUOMI_UI
 #define H_DUOMI_UI
 #include <QApplication>
@@ -14,12 +11,12 @@
 #include <iostream>
 using namespace std;
 
-class MyWin: public QMainWindow, public Ui::MainWindow{
-	Q_OBJECT QString downloadUrl;
-	QNetworkAccessManager * downloader;
+class MyWin: public QMainWindow, public Ui::MainWindow {
+	Q_OBJECT QString RealUrl;
+	QNetworkAccessManager *downloader;
 	ofstream fout;
-	QNetworkReply * page;
-	QNetworkReply * data;
+	QNetworkReply *page;
+	QNetworkReply *data;
 	bool getUrl();
 
 	public:
@@ -30,7 +27,8 @@ class MyWin: public QMainWindow, public Ui::MainWindow{
 		void downloadError(QString);
 		void downloadData();
 		void allFinished();
-		void setProgress(qint64 value, qint64 total);
+		void setProgress(qint64, qint64);
+		void restore();
 };
 
 #endif
