@@ -12,16 +12,16 @@
 using namespace std;
 
 class MyWin: public QMainWindow, public Ui::MainWindow {
-	Q_OBJECT QString RealUrl;
-	QNetworkAccessManager *downloader;
-	ofstream fout;
-	QNetworkReply *page;
-	QNetworkReply *data;
-	bool getUrl();
+	private:
+		Q_OBJECT QString RealUrl;
+		QNetworkAccessManager *downloader;
+		ofstream fout;
+		QNetworkReply *page;
+		QNetworkReply *data;
+		bool getUrl();
 
 	public:
 		MyWin();
-		void print_msg(const QString & msg);
 	public slots:
 		void downloadPage();
 		void downloadError(QString);

@@ -71,8 +71,6 @@ void MyWin::downloadData(){
 	// set header
 	QNetworkRequest header;
 	header.setUrl(QUrl(RealUrl));
-	header.setRawHeader("Accept-Charset", "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3");
-	header.setRawHeader("Accept-Language", "en-us,en;q=0.8");
 	header.setRawHeader("Connection", "keep-alive");
 	header.setRawHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
 	header.setRawHeader("Referer", "http://ear.duomi.com/wp-content/plugins/audio-player/assets/player.swf?ver=2.0.4.1");
