@@ -4,6 +4,7 @@
 MyWin::MyWin(){
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8")); // Chinese Support
 	setupUi(this);
+	setFixedSize(geometry().width(), geometry().height());
 	downloader = new QNetworkAccessManager;
 	downloader->setCookieJar(new QNetworkCookieJar);
 	connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(downloadPage()));

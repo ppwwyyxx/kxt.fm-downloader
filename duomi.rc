@@ -1,3 +1,3 @@
 IDI_ICON1               ICON    DISCARDABLE     "0.ico"
 IDI_ICON2               RCDATA  DISCARDABLE     "sun.png"
-IDI_ICON3               RCDATA  DISCARDABLE     "newhead.png"
+IDI_ICON3               RCDATA  DISCARDABLE     "background.png"
