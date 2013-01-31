@@ -1,0 +1,5 @@
+./Makefile
+./*.o
+./duomi
+./moc_MyUi.cpp
+./ui_duomi.h
